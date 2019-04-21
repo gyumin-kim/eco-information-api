@@ -1,8 +1,10 @@
 package com.example.ecoinformationapi.service.load;
 
 import com.opencsv.CSVReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,9 @@ public class LoadService {
 
 		CSVReader reader;
 		try {
-			reader = new CSVReader(new FileReader(fileName));
+			FileInputStream fis = new FileInputStream(fileName);
+			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+			reader = new CSVReader(isr);
 			String[] line;
 			while ((line = reader.readNext()) != null) {
 				list.add(line);
@@ -28,17 +32,4 @@ public class LoadService {
 
 		return list;
 	}
-
-//	public List<String[]> readAll(Reader reader) throws Exception {
-////		CSVReader csvReader = new CSVReaderBuilder(reader)
-////				.withSkipLines(0)
-////				.withCSVParser(new CSVParser())
-////				.build();
-//		CSVReader csvReader = new CSVReader(reader);
-//		List<String[]> list = csvReader.readAll();
-//		reader.close();
-//		csvReader.close();
-//
-//		return list;
-//	}
 }
