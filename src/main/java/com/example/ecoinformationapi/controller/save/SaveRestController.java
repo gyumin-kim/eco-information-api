@@ -3,7 +3,6 @@ package com.example.ecoinformationapi.controller.save;
 import com.example.ecoinformationapi.service.load.LoadService;
 import com.example.ecoinformationapi.service.save.SaveService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,9 +14,6 @@ public class SaveRestController {
 	private LoadService loadService;
 	private SaveService saveService;
 
-	@Value("${csv.path}")
-	private String csvPath;
-
 	public SaveRestController(LoadService loadService,
 			SaveService saveService) {
 		this.loadService = loadService;
@@ -27,7 +23,7 @@ public class SaveRestController {
 	@GetMapping(path = "save")
 	public void readAndSave() {
 		// CSV 파일로부터 데이터를 읽어온다.
-		List<String[]> list = loadService.readAll(csvPath);
+		List<String[]> list = loadService.readAll();
 
 		// 각 레코드를 Database에 저장한다.
 		saveService.save(list);

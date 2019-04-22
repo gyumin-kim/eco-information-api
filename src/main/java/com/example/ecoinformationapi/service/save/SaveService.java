@@ -44,9 +44,17 @@ public class SaveService {
       String regions = arr[3];
       String[] regionArr = regions.split(", ");
       for (String regionName : regionArr) {
-        String regionCode = "reg" + currRegionCode++;
-        Region region = new Region(regionCode, regionName);
-        region.setProgram(program);
+
+        //TODO: Program - Region: ManyToMany로 변경해야 함.
+        Region region;
+        if (regionRepository.existsByName(regionName)) {
+          region = regionRepository.findByName(regionName);
+        } else {
+          String regionCode = "reg" + currRegionCode++;
+          region = new Region(regionCode, regionName);
+          region.setProgram(program);
+        }
+
         regionRepository.save(region);
       }
     }

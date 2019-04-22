@@ -7,20 +7,24 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoadService {
 
+  @Value("${csv.path}")
+  private String csvPath;
+
   /**
    * CSV 파일을 읽어들여 각 line을 List 형태로 리턴한다.
    */
-  public List<String[]> readAll(String fileName) {
+  public List<String[]> readAll() {
     CSVReader reader;
     List<String[]> list = new ArrayList<>();
 
     try {
-      FileInputStream fis = new FileInputStream(fileName);
+      FileInputStream fis = new FileInputStream(csvPath);
       InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
       reader = new CSVReader(isr);
       reader.skip(1);
