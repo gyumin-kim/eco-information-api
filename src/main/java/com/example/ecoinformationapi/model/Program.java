@@ -4,10 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Getter;
@@ -19,7 +17,7 @@ import lombok.Setter;
 @Table(name = "PROGRAM")
 public class Program {
 
-	@Id	@GeneratedValue
+	@Id
 	@Column(name = "PROGRAM_ID")
 	private Long id;
 
@@ -27,13 +25,13 @@ public class Program {
 	@Column(name = "PRGM_NAME")
 	private String prgmName;
 
-	// 프로그램 코드
-	@Column(name = "CODE")
-	private String code;
-
 	// 테마
 	@Column(name = "THEME")
 	private String theme;
+
+	// 서비스 지역
+	@OneToMany(mappedBy = "program")
+	private Set<Region> regions = new HashSet<>();
 
 	// 소개
 	@Column(name = "INTRO")
@@ -41,11 +39,12 @@ public class Program {
 
 	// 상세 소개
 	@Column(name = "DETAILED_INTRO")
+	@Lob
 	private String detailedIntro;
 
-	// 서비스 지역
-	@OneToMany(mappedBy = "program")
-	private Set<Region> regions = new HashSet<>();
+	// 프로그램 코드
+	@Column(name = "CODE")
+	private String code;
 
 	public void addRegion(Region region) {
 		this.regions.add(region);
@@ -54,5 +53,18 @@ public class Program {
 		if (region.getProgram() != this) {
 			region.setProgram(this);
 		}
+	}
+
+	public Program() {
+	}
+
+	public Program(Long id, String prgmName, String theme, String intro, String detailedIntro,
+			String code) {
+		this.id = id;
+		this.prgmName = prgmName;
+		this.theme = theme;
+		this.intro = intro;
+		this.detailedIntro = detailedIntro;
+		this.code = code;
 	}
 }

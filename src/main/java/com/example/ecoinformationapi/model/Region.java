@@ -2,8 +2,6 @@ package com.example.ecoinformationapi.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -17,15 +15,15 @@ import lombok.Setter;
 @Table(name = "REGION")
 public class Region {
 
-	@Id	@GeneratedValue
-	@Column(name = "REGION_ID")
-	private Long id;
+	// 지역코드 (ex. "reg3726")
+	@Id
+	@Column(name = "CODE")
+	private String code;
+	//	@Column(name = "REGION_ID")
+//	private Long id;
 
 	@Column(name = "NAME")
 	private String name;
-
-	@Column(name = "CODE")
-	private String code;
 
 	@ManyToOne
 	@JoinColumn(name = "PROGRAM_ID")
@@ -38,5 +36,13 @@ public class Region {
 		if (!program.getRegions().contains(this)) {
 			program.getRegions().add(this);
 		}
+	}
+
+	public Region() {
+	}
+
+	public Region(String code, String name) {
+		this.code = code;
+		this.name = name;
 	}
 }
