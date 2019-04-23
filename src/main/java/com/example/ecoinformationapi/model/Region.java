@@ -1,10 +1,11 @@
 package com.example.ecoinformationapi.model;
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,24 +20,14 @@ public class Region {
 	@Id
 	@Column(name = "CODE")
 	private String code;
-	//	@Column(name = "REGION_ID")
-//	private Long id;
 
+	// 지역
 	@Column(name = "NAME")
 	private String name;
 
-	@ManyToOne
-	@JoinColumn(name = "PROGRAM_ID")
-	private Program program;
-
-	public void setProgram(Program program) {
-		this.program = program;
-
-		// 무한루프 체크
-		if (!program.getRegions().contains(this)) {
-			program.getRegions().add(this);
-		}
-	}
+	// 이 지역에서 서비스되는 프로그램들
+	@ManyToMany(mappedBy = "regions")
+	private Set<Program> programs = new HashSet<>();
 
 	public Region() {
 	}

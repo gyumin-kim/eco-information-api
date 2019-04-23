@@ -26,6 +26,6 @@ public class SaveRestController {
 		List<String[]> list = loadService.readAll();
 
 		// 각 레코드를 Database에 저장한다.
-		saveService.save(list);
+		saveService.saveProgram(list);
 	}
 }
