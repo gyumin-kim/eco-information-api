@@ -9,4 +9,7 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 
   @Query("SELECT p FROM Program p JOIN FETCH ProgramRegion pr ON pr.program.id = p.id WHERE pr.region.code = :regionCode")
   Set<Program> findByRegionCode(String regionCode);
+
+  @Query("SELECT MAX(p.id) FROM Program p")
+  Long findMaxId();
 }

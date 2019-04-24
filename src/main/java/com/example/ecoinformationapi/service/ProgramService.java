@@ -1,5 +1,6 @@
 package com.example.ecoinformationapi.service;
 
+import com.example.ecoinformationapi.dto.CreateDataDto;
 import com.example.ecoinformationapi.dto.ProgramInfoDto;
 import com.example.ecoinformationapi.dto.SearchProgramByRegionCodeDto;
 import com.example.ecoinformationapi.model.Program;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProgramService {
 
+  private InitService initService;
   private ProgramRepository programRepository;
   private RegionRepository regionRepository;
 
-  public ProgramService(ProgramRepository programRepository,
+  public ProgramService(InitService initService,
+      ProgramRepository programRepository,
       RegionRepository regionRepository) {
+    this.initService = initService;
     this.programRepository = programRepository;
     this.regionRepository = regionRepository;
   }
@@ -49,5 +53,31 @@ public class ProgramService {
     }
 
     return resultDto;
+  }
+
+  /**
+   * 입력으로 들어온 {@param dto}의 정보들을 활용하여 Program 추가.
+   * '서비스 지역' 활용하여 Region 객체도 추가
+   */
+  public CreateDataDto addProgram(CreateDataDto dto) {
+    Long id = getNextProgramId();
+    String prgmName = dto.getPrgm_name();
+    String theme = dto.getTheme();
+    String intro = dto.getIntro();
+    String detailedIntro = dto.getDetailed_intro();
+    String code = InitService.incrementPrgmCode();
+
+    Program program = new Program(id, prgmName, theme, intro, detailedIntro, code);
+    programRepository.save(program);
+
+    String regions = dto.getRegions();
+    initService.generateRegion(regions, program);
+
+    // Program, Region 저장 완료
+    return dto;
+  }
+
+  private Long getNextProgramId() {
+    return programRepository.findMaxId() + 1;
   }
 }

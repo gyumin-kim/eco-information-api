@@ -26,6 +26,11 @@ public class InitService {
   @Value("${csv.path}")
   private String csvPath;
 
+  //TODO: application.properties에 설정해 놓는 방식
+  // (https://jiyeonseo.github.io/2016/08/27/spring-inject-static-variables/)
+  private static String currPrgmCode = "0522";
+  private static int currRegionCode = 3700;
+
   public InitService(ProgramRepository programRepository,
       RegionRepository regionRepository,
       ProgramRegionRepository programRegionRepository) {
@@ -55,8 +60,8 @@ public class InitService {
   }
 
   public void saveProgram(List<String[]> list) {
-    String currPrgmCode = "0520";
-    int currRegionCode = 3700;
+//    String currPrgmCode = "0520";
+//    int currRegionCode = 3700;
 
     for (String[] arr : list) {
       Long id = Long.parseLong(arr[0]);
@@ -65,28 +70,29 @@ public class InitService {
       String intro = arr[4];
       String detailedIntro = arr[5];
 
-      String tmpPrgmCode = String
-          .format("%0" + currPrgmCode.length() + "d", Integer.parseInt(currPrgmCode) + 1);
-      String code = "prg" + tmpPrgmCode;
-      currPrgmCode = tmpPrgmCode;
+      String code = incrementPrgmCode();
 
       Program program = new Program(id, prgmName, theme, intro, detailedIntro, code);
       programRepository.save(program);
 
-      String regions = arr[3];
-      String[] regionsArr = regions.split(", ");
-      for (String regionFull : regionsArr) {
+      generateRegion(arr[3], program);
+    }
+  }
 
-        // 전체 통으로 하나의 Region
-        currRegionCode = saveRegion(currRegionCode, program, regionFull);
+  void generateRegion(String regions, Program program) {
+    String[] regionsArr = regions.split(", ");
+    for (String regionFull : regionsArr) {
 
-        // 공백으로 split한 개별 region들
-        String[] regionPartArr = regionFull.split(" ");
-        for (String regionPart : regionPartArr) {
-          currRegionCode = saveRegion(currRegionCode, program, regionPart);
-        }
-        programRepository.save(program);
+      // 전체 하나의 Region을 저장 (공백 고려하지 않음)
+      currRegionCode = saveRegion(currRegionCode, program, regionFull);
+
+      // 공백으로 split한 개별 region들을 각각 저장
+      String[] regionPartArr = regionFull.split(" ");
+      for (String regionPart : regionPartArr) {
+        currRegionCode = saveRegion(currRegionCode, program, regionPart);
       }
+
+      programRepository.save(program);
     }
   }
 
@@ -98,8 +104,6 @@ public class InitService {
     } else {
       region = regionRepository.findByName(regionName);
     }
-    programRepository.save(program);
-//    program.addRegion(region);  // 양방향 연관관계 설정
     regionRepository.save(region);
 
     ProgramRegion programRegion = new ProgramRegion();
@@ -110,48 +114,12 @@ public class InitService {
     return currRegionCode;
   }
 
-  //  public List<String[]> readAll(String fileName) {
-//    List<String[]> list = new ArrayList<>();
-//    CsvToBean<Program> csvToBean = new CsvToBean<>();
-////    HeaderColumnNameTranslateMappingStrategy<Program> strategy =
-////        new HeaderColumnNameTranslateMappingStrategy<>();
-//    ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
-//    strategy.setType(Program.class);
-////    String[] columns = new String[]{"id", "prgmName", "code", "theme", "intro", "detailedIntro",
-//    String[] columns = new String[]{"id", "prgmName", "theme", "intro",
-//        "detailedIntro"}; // the fields to bind to in your bean
-//    strategy.setColumnMapping(columns);
-//
-//    CSVReader reader;
-//    try {
-//      FileInputStream fis = new FileInputStream(fileName);
-//      InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-//      reader = new CSVReader(isr);
-//      reader.skip(1);  // header row 생략
-//
-////      List<Program> programs = csvToBean.parse(strategy, reader);
-//      List<Program> programs = new CsvToBeanBuilder(reader)
-//          .withType(Program.class)
-//          .withMappingStrategy(strategy)
-//          .build()
-//          .parse();
-//      for (Program program : programs) {
-//        log.info(program.getId() + "");
-//        log.info(program.getPrgmName());
-//        log.info(program.getTheme());
-//        log.info(program.getRegions().toString());
-//        log.info(program.getIntro());
-//        log.info(program.getDetailedIntro());
-//      }
-//
-//      String[] line;
-//      while ((line = reader.readNext()) != null) {
-//        list.add(line);
-//      }
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//
-//    return list;
-//  }
+  static String incrementPrgmCode() {
+    String tmpPrgmCode = String
+        .format("%0" + currPrgmCode.length() + "d", Integer.parseInt(currPrgmCode) + 1);
+    String code = "prg" + tmpPrgmCode;
+    currPrgmCode = tmpPrgmCode;
+
+    return code;
+  }
 }
