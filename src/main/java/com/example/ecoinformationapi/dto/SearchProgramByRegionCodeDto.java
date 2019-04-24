@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class SearchProgramByRegionCodeDto {
 
-  private String regionCode;
+  private String region_code;
 
   private Set<ProgramInfoDto> programs = new HashSet<>();
 }

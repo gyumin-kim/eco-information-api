@@ -29,7 +29,7 @@ public class ProgramService {
   public SearchProgramByRegionCodeDto getProgramsByRegionCode(String regionCode) {
     SearchProgramByRegionCodeDto resultDto = new SearchProgramByRegionCodeDto();
 
-    resultDto.setRegionCode(regionCode);
+    resultDto.setRegion_code(regionCode);
 
     Set<ProgramInfoDto> programDtos = resultDto.getPrograms();
     String regionName = regionRepository.findNameByCode(regionCode);
