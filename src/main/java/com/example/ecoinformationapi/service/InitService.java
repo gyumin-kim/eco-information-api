@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InitService {
@@ -42,6 +43,7 @@ public class InitService {
   /**
    * CSV 파일을 읽어들여 각 line을 List 형태로 리턴한다.
    */
+  @Transactional(readOnly = true)
   public List<String[]> readAll() {
     CSVReader reader;
     List<String[]> list = new ArrayList<>();
@@ -59,10 +61,10 @@ public class InitService {
     return list;
   }
 
+  @Transactional
   public void saveProgram(List<String[]> list) {
 //    String currPrgmCode = "0520";
 //    int currRegionCode = 3700;
-
     for (String[] arr : list) {
       Long id = Long.parseLong(arr[0]);
       String prgmName = arr[1];
@@ -73,13 +75,63 @@ public class InitService {
       String code = incrementPrgmCode();
 
       Program program = new Program(id, prgmName, theme, intro, detailedIntro, code);
-      programRepository.save(program);
-
-      generateRegion(arr[3], program);
+      programRepository.save(program);  // Program에 save 완료
     }
   }
 
-  void generateRegion(String regions, Program program) {
+  @Transactional
+  public void resolveRegions(List<String[]> list) {
+    for (String[] arr : list) {
+      Long id = Long.parseLong(arr[0]);
+
+      Program program = programRepository.getOne(id);
+      String regions = arr[3];
+
+      String[] regionsArr = regions.split(", ");
+
+      for (String regionFull : regionsArr) {
+        // 전체 하나의 Region을 저장 (공백 고려하지 않음)
+        currRegionCode = saveRegion(currRegionCode, program, regionFull);
+        mapProgramRegion(program, regionRepository.findByName(regionFull));
+
+        // 공백으로 split한 개별 region들을 각각 저장
+        String[] regionPartArr = regionFull.split(" ");
+        for (String regionPart : regionPartArr) {
+          currRegionCode = saveRegion(currRegionCode, program, regionPart);
+          mapProgramRegion(program, regionRepository.findByName(regionPart));
+        }
+        programRepository.save(program);
+      }
+    }
+  }
+
+  @Transactional
+  public int saveRegion(int currRegionCode, Program program, String regionName) {
+    Region region;
+    if (!regionRepository.existsByName(regionName)) {
+      String regionCode = "reg" + currRegionCode++;
+      region = new Region(regionCode, regionName);
+    } else {
+      region = regionRepository.findByName(regionName);
+    }
+    regionRepository.save(region);  // Region에 save 완료
+
+    return currRegionCode;
+  }
+
+  /**
+   * Program_Region 테이블 데이터 생성
+   */
+  @Transactional
+  public void mapProgramRegion(Program program, Region region) {
+    ProgramRegion programRegion = new ProgramRegion();
+    programRegion.setProgram(program);
+    programRegion.setRegion(region);
+    programRegionRepository.save(programRegion);
+  }
+
+  @Transactional
+  public void generateRegion(String regions, Program program) {
     String[] regionsArr = regions.split(", ");
     for (String regionFull : regionsArr) {
 
@@ -94,24 +146,6 @@ public class InitService {
 
       programRepository.save(program);
     }
-  }
-
-  private int saveRegion(int currRegionCode, Program program, String regionName) {
-    Region region;
-    if (!regionRepository.existsByName(regionName)) {
-      String regionCode = "reg" + currRegionCode++;
-      region = new Region(regionCode, regionName);
-    } else {
-      region = regionRepository.findByName(regionName);
-    }
-    regionRepository.save(region);
-
-    ProgramRegion programRegion = new ProgramRegion();
-    programRegion.setProgram(program);
-    programRegion.setRegion(region);
-    programRegionRepository.save(programRegion);
-
-    return currRegionCode;
   }
 
   static String incrementPrgmCode() {

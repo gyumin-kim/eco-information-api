@@ -27,5 +27,6 @@ public class MainRestController {
 
 		List<String[]> list = initService.readAll();
 		initService.saveProgram(list);
+		initService.resolveRegions(list);
 	}
 }

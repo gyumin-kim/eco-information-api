@@ -8,6 +8,7 @@ import com.example.ecoinformationapi.repository.ProgramRepository;
 import com.example.ecoinformationapi.repository.RegionRepository;
 import java.util.Set;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProgramService {
@@ -30,6 +31,7 @@ public class ProgramService {
    * @param regionCode 지역코드 (= Region 고유코드)
    * @return {@param regionCode}에 해당하는 지역에서 서비스 되는 Program들의 집합
    */
+  @Transactional(readOnly = true)
   public SearchProgramByRegionCodeDto getProgramsByRegionCode(String regionCode) {
     SearchProgramByRegionCodeDto resultDto = new SearchProgramByRegionCodeDto();
 
@@ -59,7 +61,8 @@ public class ProgramService {
    * 입력으로 들어온 {@param dto}의 정보들을 활용하여 Program 추가.
    * '서비스 지역' 활용하여 Region 객체도 추가
    */
-  public CreateDataDto addProgram(CreateDataDto dto) {
+  @Transactional
+  public void addProgram(CreateDataDto dto) {
     Long id = getNextProgramId();
     String prgmName = dto.getPrgm_name();
     String theme = dto.getTheme();
@@ -72,9 +75,6 @@ public class ProgramService {
 
     String regions = dto.getRegions();
     initService.generateRegion(regions, program);
-
-    // Program, Region 저장 완료
-    return dto;
   }
 
   private Long getNextProgramId() {
