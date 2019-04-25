@@ -26,6 +26,7 @@
 - 단, 조회는 서비스 지역 코드를 기준으로 검색한다.
 - **문제해결 전략**
   - 조회 기능
+    - 서비스 지역 코드를 JSON 형태로 담아서 `/api/regioncode`로 요청 (POST)
     - 입력 예시
     ```json5
     {
@@ -40,6 +41,7 @@
           {
             "id": 2,
             "prgm_name": "[설악산] 설악산에서 길을 묻다(설악을 내 품에)",
+            "prgm_code": "prg0524",
             "theme": "아동·청소년 체험학습,",
             "region_name": "속초",
             "intro": "소규모 학생을 위한 수학여행 프로그램!",
@@ -49,7 +51,21 @@
         ]
       }
     ```
-
+  - 추가 기능
+    - 추가하고자 하는 Program 정보를 담아서 `/api/new`로 요청 (POST)
+    - 입력 예시
+      ```json5
+        {
+          "prgm_name": "예시 프로그램",
+          "theme": "자연생태체험, 건강나누리캠프",
+          "regions": "인천광역시 연수구 동춘동, 송도동",
+          "intro": "예시 프로그램 소개",
+          "detailed_intro": "예시 프로그램의 상세한 소개입니다!"
+        }
+      ```
+  - 수정 기능
+    - (예정)
+      
 ### 생태 관광지 중에 '서비스 지역' 컬럼에서 특정 지역에서 진행되는 프로그램명과 테마를 출력하는 API
 - ex) `평창군`이라는 문자열을 입력 받으면 아래와 같은 결과를 출력한다.
 - 단, 출력 결과에 지역은 지역 코드를 출력한다.
@@ -128,4 +144,17 @@
 - OpenCSV
 
 ## 실행 방법
+#### Database
+1. `mysql -u root -p`
+2. `create user 'kp'@'%' identified by 'kp';`
+3. `grant all on kpdb.* to 'kp'@'%';`
+4. `create user 'todouser'@'localhost' identified by 'kp';`
+5. `grant all on kpdb.* to 'kp'@'localhost';`
+6. `flush privileges;`
 
+#### Project
+1. `git clone https://github.com/gyumin-kim/eco-information-api.git`
+2. `cd eco-information-api`
+3. `mvn package`
+4. `java -jar target/eco-information-api-0.0.1-SNAPSHOT.jar`
+5. `http://localhost:8080`으로 접속

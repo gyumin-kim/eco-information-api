@@ -8,6 +8,7 @@ import lombok.Setter;
 public class ProgramInfoDto {
 
   private Long id;
+  private String prgm_code;
   private String prgm_name;
   private String theme;
   private String region_name;

@@ -46,6 +46,7 @@ public class ProgramService {
 
       programInfoDto.setId(program.getId());
       programInfoDto.setPrgm_name(program.getName());
+      programInfoDto.setPrgm_code(program.getCode());
       programInfoDto.setTheme(program.getTheme());
       programInfoDto.setRegion_name(regionName); // TODO: 지역명 여러개일 경우 여러개 그대로 담아주기?? 아니면 하나만?
       programInfoDto.setIntro(program.getIntro());
