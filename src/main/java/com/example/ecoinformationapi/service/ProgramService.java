@@ -3,6 +3,7 @@ package com.example.ecoinformationapi.service;
 import com.example.ecoinformationapi.dto.CreateDataDto;
 import com.example.ecoinformationapi.dto.ProgramInfoDto;
 import com.example.ecoinformationapi.dto.SearchProgramByRegionCodeDto;
+import com.example.ecoinformationapi.dto.UpdateDataDto;
 import com.example.ecoinformationapi.model.Program;
 import com.example.ecoinformationapi.repository.ProgramRepository;
 import com.example.ecoinformationapi.repository.RegionRepository;
@@ -63,7 +64,7 @@ public class ProgramService {
    * '서비스 지역' 활용하여 Region 객체도 추가
    */
   @Transactional
-  public void addProgram(CreateDataDto dto) {
+  public Program addProgram(CreateDataDto dto) {
     Long id = getNextProgramId();
     String prgmName = dto.getPrgm_name();
     String theme = dto.getTheme();
@@ -74,11 +75,37 @@ public class ProgramService {
     Program program = new Program(id, prgmName, theme, intro, detailedIntro, code);
     programRepository.save(program);
 
-    String regions = dto.getRegions();
-    initService.generateRegion(regions, program);
+//    String regions = dto.getRegions();
+//    initService.generateRegion(regions, program);
+    return program;
   }
 
   private Long getNextProgramId() {
     return programRepository.findMaxId() + 1;
+  }
+
+  @Transactional(readOnly = true)
+  public Program getProgramByCode(String prgmCode) {
+    return programRepository.findByCode(prgmCode);
+  }
+
+  @Transactional
+  public Program modifyProgram(Program target, UpdateDataDto update) {
+    if (update.getPrgm_name() != null) {
+      target.setName(update.getPrgm_name());
+    }
+    if (update.getTheme() != null) {
+      target.setTheme(update.getTheme());
+    }
+    if (update.getIntro() != null) {
+      target.setIntro(update.getIntro());
+    }
+    if (update.getDetailed_intro() != null) {
+      target.setDetailedIntro(update.getDetailed_intro());
+    }
+
+    programRepository.save(target);
+
+    return target;
   }
 }

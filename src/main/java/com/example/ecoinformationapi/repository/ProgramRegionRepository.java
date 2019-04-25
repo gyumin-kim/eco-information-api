@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProgramRegionRepository extends JpaRepository<ProgramRegion, Long> {
 
+  void deleteAllByProgramId(Long id);
 }

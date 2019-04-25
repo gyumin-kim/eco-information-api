@@ -91,13 +91,13 @@ public class InitService {
 
       for (String regionFull : regionsArr) {
         // 전체 하나의 Region을 저장 (공백 고려하지 않음)
-        currRegionCode = saveRegion(currRegionCode, program, regionFull);
+        saveRegion(regionFull);
         mapProgramRegion(program, regionRepository.findByName(regionFull));
 
         // 공백으로 split한 개별 region들을 각각 저장
         String[] regionPartArr = regionFull.split(" ");
         for (String regionPart : regionPartArr) {
-          currRegionCode = saveRegion(currRegionCode, program, regionPart);
+          saveRegion(regionPart);
           mapProgramRegion(program, regionRepository.findByName(regionPart));
         }
         programRepository.save(program);
@@ -106,7 +106,29 @@ public class InitService {
   }
 
   @Transactional
-  public int saveRegion(int currRegionCode, Program program, String regionName) {
+  public List<Region> generateRegion(String regions) {
+    List<Region> regionList = new ArrayList<>();
+
+    String[] regionsArr = regions.split(", ");
+    for (String regionFull : regionsArr) {
+
+      // 전체 하나의 Region을 저장 (공백 고려하지 않음)
+      regionList.add(saveRegion(regionFull));
+//      mapProgramRegion(program, regionRepository.findByName(regionFull));
+
+      // 공백으로 split한 개별 region들을 각각 저장
+      String[] regionPartArr = regionFull.split(" ");
+      for (String regionPart : regionPartArr) {
+        regionList.add(saveRegion(regionPart));
+//        mapProgramRegion(program, regionRepository.findByName(regionPart));
+      }
+    }
+
+    return regionList;
+  }
+
+  @Transactional
+  public Region saveRegion(String regionName) {
     Region region;
     if (!regionRepository.existsByName(regionName)) {
       String regionCode = "reg" + currRegionCode++;
@@ -115,8 +137,9 @@ public class InitService {
       region = regionRepository.findByName(regionName);
     }
     regionRepository.save(region);  // Region에 save 완료
+    //TODO: 수정 시 매핑 안되는 이유 => region이 아직 저장 안된 상태라서?
 
-    return currRegionCode;
+    return region;
   }
 
   /**
@@ -128,24 +151,6 @@ public class InitService {
     programRegion.setProgram(program);
     programRegion.setRegion(region);
     programRegionRepository.save(programRegion);
-  }
-
-  @Transactional
-  public void generateRegion(String regions, Program program) {
-    String[] regionsArr = regions.split(", ");
-    for (String regionFull : regionsArr) {
-
-      // 전체 하나의 Region을 저장 (공백 고려하지 않음)
-      currRegionCode = saveRegion(currRegionCode, program, regionFull);
-
-      // 공백으로 split한 개별 region들을 각각 저장
-      String[] regionPartArr = regionFull.split(" ");
-      for (String regionPart : regionPartArr) {
-        currRegionCode = saveRegion(currRegionCode, program, regionPart);
-      }
-
-      programRepository.save(program);
-    }
   }
 
   static String incrementPrgmCode() {

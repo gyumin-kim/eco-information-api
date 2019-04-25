@@ -12,4 +12,6 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 
   @Query("SELECT MAX(p.id) FROM Program p")
   Long findMaxId();
+
+  Program findByCode(String code);
 }
