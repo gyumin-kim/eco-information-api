@@ -148,7 +148,7 @@
 1. `mysql -u root -p`
 2. `create user 'kp'@'%' identified by 'kp';`
 3. `grant all on kpdb.* to 'kp'@'%';`
-4. `create user 'todouser'@'localhost' identified by 'kp';`
+4. `create user 'kp'@'localhost' identified by 'kp';`
 5. `grant all on kpdb.* to 'kp'@'localhost';`
 6. `flush privileges;`
 
